@@ -1,0 +1,190 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+enum AssetType {
+  IMAGE
+  VIDEO
+  MODEL_3D
+  ANIMATION
+  AVATAR
+}
+
+enum ModelFormat {
+  GLB
+  FBX
+  BLEND
+  OBJ
+  GLTF
+}
+
+enum JobType {
+  TEXT_TO_AVATAR
+  IMAGE_TO_3D
+  VIDEO_TO_ANIMATION
+  PROMPT_TO_ANIMATION
+  EXPORT_BLENDER
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id             String        @id @default(uuid())
+  email          String        @unique
+  passwordHash   String
+  name           String
+  role           UserRole      @default(USER)
+  credits        Int           @default(0)
+  subscriptionId String?       @unique
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  projects Project[]
+  assets   Asset[]
+  jobs     Job[]
+  avatars  Avatar[]
+
+  @@index([email])
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  userId               String             @unique
+  user                 User?
+  tier                 SubscriptionTier   @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  creditsPerMonth      Int                @default(100)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodEnd     DateTime
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([stripeCustomerId])
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  thumbnail   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assets  Asset[]
+  jobs    Job[]
+  avatars Avatar[]
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Asset {
+  id        String     @id @default(uuid())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      AssetType
+  name      String
+  url       String
+  format    ModelFormat?
+  size      Int
+  metadata  Json?
+  createdAt DateTime   @default(now())
+
+  models Model3D[]
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([type])
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  type        JobType
+  status      JobStatus @default(PENDING)
+  progress    Int       @default(0)
+  input       Json
+  output      Json?
+  error       String?
+  creditsUsed Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Model3D {
+  id           String   @id @default(uuid())
+  assetId      String
+  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  vertices     Int
+  faces        Int
+  materials    Int
+  hasSkeleton  Boolean  @default(false)
+  skeleton     Json?
+  animations   Json?
+  boundingBox  Json
+  createdAt    DateTime @default(now())
+
+  @@index([assetId])
+}
+
+model Avatar {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  name      String
+  modelId   String
+  config    Json
+  thumbnail String?
+  isRigged  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+}
