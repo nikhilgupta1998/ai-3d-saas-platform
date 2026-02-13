@@ -5,6 +5,14 @@
 ### Summary
 Fixed all identified security vulnerabilities by upgrading affected dependencies to their patched versions.
 
+## Updates
+
+### Update 1 - Initial Fixes
+Fixed 5 critical vulnerabilities across npm and Python packages.
+
+### Update 2 - Additional Pillow Fix
+Fixed additional out-of-bounds write vulnerability in Pillow.
+
 ## Vulnerabilities Fixed
 
 ### npm Packages
@@ -48,11 +56,17 @@ Fixed all identified security vulnerabilities by upgrading affected dependencies
 - Patched version: 0.0.22
 
 #### 5. Pillow (services/ai-worker)
-**Vulnerability**: Buffer overflow vulnerability
-
+**Vulnerability 1**: Buffer overflow vulnerability
 **Fix**: Upgraded from `10.2.0` → `10.3.0`
 - Affected versions: < 10.3.0
 - Patched version: 10.3.0
+
+**Vulnerability 2**: Out-of-bounds write when loading PSD images
+**Fix**: Upgraded from `10.3.0` → `12.1.1`
+- Affected versions: >= 10.3.0, < 12.1.1
+- Patched version: 12.1.1
+
+**Final Version**: `12.1.1` ✅
 
 ## Impact Assessment
 
@@ -61,7 +75,7 @@ Fixed all identified security vulnerabilities by upgrading affected dependencies
 - **Next.js**: MEDIUM - DoS attacks affecting React Server Components
 - **fastapi**: MEDIUM - ReDoS could cause service degradation
 - **python-multipart**: HIGH - Arbitrary file write and DoS vulnerabilities
-- **Pillow**: HIGH - Buffer overflow could lead to code execution
+- **Pillow**: CRITICAL - Buffer overflow and out-of-bounds write could lead to code execution
 
 ### Affected Services
 - ✅ Backend API (NestJS) - multer updated
