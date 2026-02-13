@@ -1,0 +1,131 @@
+# Motion Capture to Blender
+
+Real-time motion capture application that records human body movement using a camera and converts it into Blender-compatible animated 3D models.
+
+## Features
+
+- 🎥 **Real-time Motion Capture**: Track full-body pose using webcam at 30+ FPS
+- 🦴 **3D Skeleton Visualization**: Live preview of tracked skeleton in 3D
+- 📹 **Recording System**: Start/stop recording with session management
+- 📊 **Pose Smoothing**: EMA and Kalman filtering for jitter reduction
+- 📦 **Multiple Export Formats**: 
+  - BVH (Biovision Hierarchy) - Industry standard
+  - Blender Python Script - Direct import into Blender
+- 🔄 **WebSocket Streaming**: Low-latency real-time pose data streaming
+- 💻 **Modern UI**: React-based interface with Three.js 3D preview
+
+## Tech Stack
+
+- **Backend**: Python 3.9+, FastAPI, MediaPipe, OpenCV
+- **Frontend**: React 18, Three.js, Vite
+- **3D Processing**: MediaPipe Pose (33 landmarks), NumPy, SciPy
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.9 or higher
+- Node.js 16 or higher
+- Webcam or camera device
+
+### Backend Setup
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
+
+The backend will start on `http://localhost:8000`
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend will start on `http://localhost:3000`
+
+### Usage
+
+1. Open your browser to `http://localhost:3000`
+2. Click **Start Camera** to begin pose detection
+3. Click **Start Recording** to capture motion
+4. Perform your movements in front of the camera
+5. Click **Stop Recording** when done
+6. Select your recording and export as BVH or Blender script
+7. Import the exported file into Blender
+
+## API Documentation
+
+See [docs/API.md](docs/API.md) for detailed API documentation.
+
+## Export Formats
+
+See [docs/FORMATS.md](docs/FORMATS.md) for export format specifications.
+
+## Project Structure
+
+```
+mocap-to-blender/
+├── backend/              # Python FastAPI backend
+│   ├── app.py           # Main application
+│   ├── pose_detector.py # MediaPipe pose detection
+│   ├── smoother.py      # Jitter smoothing filters
+│   ├── skeleton.py      # 3D skeleton representation
+│   ├── retargeting.py   # Bone mapping and rotation calculation
+│   ├── recording.py     # Session management
+│   └── exporters/       # Export modules (BVH, Blender)
+├── frontend/            # React frontend
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── services/    # API and WebSocket services
+│   │   └── three/       # Three.js 3D rendering
+│   └── package.json
+├── blender/             # Blender integration
+└── docs/                # Documentation
+```
+
+## Performance
+
+- Real-time processing: 30+ FPS
+- Latency: <100ms from capture to display
+- Tracks 33 body landmarks (MediaPipe standard)
+- Supports smoothing with configurable strength
+
+## Troubleshooting
+
+### Camera not starting
+- Check camera permissions in browser
+- Ensure camera is not being used by another application
+- Try a different camera ID in settings
+
+### Low FPS
+- Reduce camera resolution
+- Lower MediaPipe model complexity
+- Close other applications
+
+### Export issues
+- Ensure recording is stopped before exporting
+- Check that recording has frames
+- Verify file permissions in export directory
+
+## Contributing
+
+Contributions are welcome! Please read the contributing guidelines before submitting PRs.
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Credits
+
+Built with:
+- [MediaPipe](https://mediapipe.dev/) - Pose detection
+- [FastAPI](https://fastapi.tiangolo.com/) - Backend framework
+- [React](https://react.dev/) - Frontend framework
+- [Three.js](https://threejs.org/) - 3D visualization
