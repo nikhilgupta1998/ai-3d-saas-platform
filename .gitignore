@@ -59,7 +59,16 @@ generated/
 temp/
 
 # Prisma
-prisma/migrations/
+.env
+!prisma/.env.example
 
 # Redis
 dump.rdb
+
+# Next.js
+.next/
+out/
+*.tsbuildinfo
+
+# Vercel
+.vercel
